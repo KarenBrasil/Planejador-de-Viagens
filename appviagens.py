@@ -1,8 +1,11 @@
 import streamlit as st
 import google.generativeai as genai
-from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib import colors
+import re
 
 # Inicializa para evitar NameError
 resposta = None
@@ -18,7 +21,7 @@ model = genai.GenerativeModel(MODEL_NAME)
 # 📌 Interface Streamlit
 # ---------------------------------------------------------
 
-st.title("✈️ Planejador Inteligente de Viagens")
+st.title("✈️ Agente Planejador de Viagens")
 st.write("Crie o roteiro da sua viagem com tudo o que você mais gosta!")
 
 nome = st.text_input("Qual seu nome?")
@@ -117,34 +120,38 @@ Para cada dia:
 # 📄 GERAR PDF COM REPORTLAB
 # ---------------------------------------------------------
 
-if resposta:
+def formatar_para_html(texto):
+    # Converter títulos
+    texto = re.sub(r"### (.*)", r"<br/><b><font size=14>\1</font></b><br/>", texto)
+    
+    # Converter listas
+    texto = texto.replace("* ", "• ")
 
-    pdf_filename = "roteiro_viagem.pdf"
+    # Quebras de linha viram <br/>
+    texto = texto.replace("\n", "<br/>")
+
+    return texto
+
+if resposta:
+    arquivo_pdf = "roteiro_viagem.pdf"
+    doc = SimpleDocTemplate(arquivo_pdf, pagesize=letter)
 
     styles = getSampleStyleSheet()
-    style = styles["Normal"]
+    estilo_normal = styles["Normal"]
+    estilo_normal.fontSize = 11
+    estilo_normal.leading = 15
 
-    doc = SimpleDocTemplate(
-        pdf_filename,
-        pagesize=letter,
-        rightMargin=40,
-        leftMargin=40,
-        topMargin=40,
-        bottomMargin=40
-    )
+    elementos = []
 
-    story = []
+    texto_html = formatar_para_html(resposta)
+    elementos.append(Paragraph(texto_html, estilo_normal))
 
-    # Adiciona texto com suporte a UTF-8
-    for linha in resposta.split("\n"):
-        story.append(Paragraph(linha.replace("\n", "<br/>"), style))
+    doc.build(elementos)
 
-    doc.build(story)
-
-    with open(pdf_filename, "rb") as f:
+    with open(arquivo_pdf, "rb") as f:
         st.download_button(
-            "📄 Baixar PDF do Roteiro",
-            f,
-            file_name=pdf_filename,
+            label="📄 Baixar PDF do Roteiro",
+            data=f,
+            file_name="roteiro_viagem.pdf",
             mime="application/pdf"
         )
