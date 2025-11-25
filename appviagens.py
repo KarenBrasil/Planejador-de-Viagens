@@ -1,6 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
-from fpdf import FPDF
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import letter
 
 # Inicializa para evitar NameError
 resposta = None
@@ -18,7 +20,6 @@ model = genai.GenerativeModel(MODEL_NAME)
 
 st.title("✈️ Planejador Inteligente de Viagens")
 st.write("Crie o roteiro da sua viagem com tudo o que você mais gosta!")
-
 
 nome = st.text_input("Qual seu nome?")
 destino = st.text_input("✨ Para onde você quer viajar?")
@@ -39,15 +40,8 @@ orcamento = st.selectbox(
     ["R$100–200", "R$200–400", "R$400–700", "R$700–1000", "R$1000+"]
 )
 
-atividade_top = st.text_input(
-    "⭐ Sua atividade número 1 que você NÃO abre mão:"
-)
-
-restricoes = st.text_area(
-    "⚠️ Alguma restrição, medo ou preferência importante?",
-    placeholder="Ex: não gosto de trilha pesada, sou vegetariano, prefiro lugares tranquilos..."
-)
-
+atividade_top = st.text_input("⭐ O que não poderia deixar de fazer:")
+restricoes = st.text_area("⚠️ Alguma restrição ou algo que prefere evitar?")
 ritmo = st.selectbox(
     "⏱️ Qual o ritmo ideal da viagem?",
     ["Leve (até 2 atividades por dia)", "Moderado (3–4 atividades por dia)", "Intenso (quero aproveitar cada minuto!)"]
@@ -59,6 +53,10 @@ transporte = st.selectbox(
 )
 
 
+# ---------------------------------------------------------
+# 🔥 GERAR ROTEIRO
+# ---------------------------------------------------------
+
 if st.button("Gerar Roteiro"):
     if not destino:
         st.warning("Digite um destino antes!")
@@ -66,43 +64,21 @@ if st.button("Gerar Roteiro"):
         with st.spinner("Gerando roteiro..."):
             try:
 
-                # 🔥 Aqui está o prompt DEFINITIVO
                 prompt = f"""
-Você agora é um EXPERT EM ROTEIROS DE VIAGENS PROFISSIONAL da região escolhida, super comunicativo, 
-cheio de energia e expert em criar viagens inesquecíveis, vantajosas e com custo beneficio de dinheiro e tempo.
+Crie um ROTEIRO COMPLETO para {dias} dias em {destino} para {nome}.
 
-Crie um ROTEIRO COMPLETO para {dias} dias em **{destino}**, seguindo exatamente as regras abaixo:
+— Estilo da viagem: {estilo}
+— Companhia: {companhia}
+— Orçamento: {orcamento}
+— Ritmo: {ritmo}
+— Atividade indispensável: {atividade_top}
+— Restrições: {restricoes}
+— Transporte: {transporte}
 
-===========================
-🌟 1. ESTILO DA RESPOSTA  
-===========================
-- Não precisa se apresentar;
-- Breve descrição do roteiro baseado nos gostos da pessoa;
-- Direcione a fala para **{nome}**
-- Linguagem direta, animada, acolhedora, empolgante e profissional.  
-- Que soe como um guia local apaixonado pelo destino.  
-- Texto fluido, claro e cheio de dicas valiosas.  
-- Nada de texto genérico — tudo deve parecer específico e pensado para essa pessoa.
+Siga a estrutura obrigatória:
 
-===========================
-👤 2. PERSONALIZAÇÃO  
-===========================
-Leve em conta TUDO a seguir:
-
-- Estilo da viagem: **{estilo}**
-- Tipo de companhia: **{companhia}**
-- Orçamento diário: **{orcamento}**
-- Ritmo da viagem: **{ritmo}**
-- Atividade indispensável: **{atividade_top}**
-- Restrições e preferências: **{restricoes}**
-- Transporte disponível no destino: **{transporte}**
-
-===========================
-📚 3. ESTRUTURA OBRIGATÓRIA  
-===========================
-
-### ✨ Visão Geral Épica da Viagem  
-— um resumo cinematográfico do que a pessoa vai viver
+### ✨ Resumão da Viagem
+300 a 400 caracteres.
 
 ### 🎒 Checklist Pré-Viagem  
 - melhor época  
@@ -111,52 +87,25 @@ Leve em conta TUDO a seguir:
 - apps úteis  
 - transporte ideal  
 
-### 📅 Roteiro Diário COMPLETO (para cada um dos {dias} dias)
-Para cada dia, descreva:
-- Manhã → atividade principal  
-- Tarde → segunda atividade  
-- Noite → jantar recomendado + atividade leve  
-Inclua:
+### 📅 Roteiro Diário (para {dias} dias)
+Para cada dia:
+- manhã
+- tarde
+- noite
 - horários
-- versões alternativas (paga / gratuita)
-- preços aproximados
+- preços
 - endereços
-- duração média
+- alternativa paga/gratuita
 
 ### 🍽️ Gastronomia Imperdível  
-— pratos típicos  
-— restaurantes por faixa de preço  
-— achadinhos locais  
-
 ### 📸 Pontos Instagramáveis  
-— melhores horários  
-— melhores ângulos  
-
-### 🌙 Vida Noturna e Passeios Extras  
-— rooftops, baladas, feirinhas, shows  
-
-### 💰 Resumo Realista dos Custos  
-— alimentação  
-— transporte  
-— passeios  
-— extras  
-
-### 💡 Dicas de Ouro do Guia Local  
-— truques  
-— como evitar filas  
-— horários de ouro  
-— golpes comuns da região  
-— o que vale muito a pena x o que evitar  
-
-===========================
-🎯 4. FINALIZAÇÃO  
-===========================
-Termine com uma mensagem acolhedora, motivadora e com vibe de:
-“Vai dar tudo certo, essa viagem vai ser INCRÍVEL.”
+### 🌙 Vida Noturna  
+### 💡 Dicas de Ouro  
+### Finalização motivadora
                 """
 
                 resposta_obj = model.generate_content(prompt)
-                resposta = resposta_obj.text  # ← agora guarda texto corretamente
+                resposta = resposta_obj.text
 
                 st.success("Roteiro gerado com sucesso! ✨")
                 st.write(resposta)
@@ -165,23 +114,37 @@ Termine com uma mensagem acolhedora, motivadora e com vibe de:
                 st.error(f"Erro ao gerar roteiro: {e}")
 
 # ---------------------------------------------------------
-# 📄 BOTÃO PARA BAIXAR O PDF
+# 📄 GERAR PDF COM REPORTLAB
 # ---------------------------------------------------------
 
-if resposta:  # ← Agora sempre funciona sem erro
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
+if resposta:
 
+    pdf_filename = "roteiro_viagem.pdf"
+
+    styles = getSampleStyleSheet()
+    style = styles["Normal"]
+
+    doc = SimpleDocTemplate(
+        pdf_filename,
+        pagesize=letter,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
+
+    story = []
+
+    # Adiciona texto com suporte a UTF-8
     for linha in resposta.split("\n"):
-        pdf.multi_cell(0, 10, linha)
+        story.append(Paragraph(linha.replace("\n", "<br/>"), style))
 
-    pdf.output("roteiro_viagem.pdf")
+    doc.build(story)
 
-    with open("roteiro_viagem.pdf", "rb") as f:
+    with open(pdf_filename, "rb") as f:
         st.download_button(
             "📄 Baixar PDF do Roteiro",
             f,
-            file_name="roteiro_viagem.pdf",
+            file_name=pdf_filename,
             mime="application/pdf"
         )
