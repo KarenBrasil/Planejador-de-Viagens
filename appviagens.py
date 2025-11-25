@@ -2,6 +2,9 @@ import streamlit as st
 import google.generativeai as genai
 from fpdf import FPDF
 
+# Inicializa para evitar NameError
+resposta = None
+
 # 🔑 Configure sua chave API
 genai.configure(api_key="AIzaSyBG8Ui2Iq_a4m8_1WtTLykyiDXizSUuffs")
 
@@ -150,14 +153,13 @@ Inclua:
 ===========================
 Termine com uma mensagem acolhedora, motivadora e com vibe de:
 “Vai dar tudo certo, essa viagem vai ser INCRÍVEL.”
-
                 """
 
-            resposta_obj = model.generate_content(prompt)
-            resposta = resposta_obj.text  # ← agora guarda texto corretamente
+                resposta_obj = model.generate_content(prompt)
+                resposta = resposta_obj.text  # ← agora guarda texto corretamente
 
-            st.success("Roteiro gerado com sucesso! ✨")
-            st.write(resposta)
+                st.success("Roteiro gerado com sucesso! ✨")
+                st.write(resposta)
 
             except Exception as e:
             st.error(f"Erro ao gerar roteiro: {e}")
