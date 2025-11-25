@@ -8,7 +8,7 @@ from reportlab.lib.pagesizes import letter
 resposta = None
 
 # 🔑 Configure sua chave API
-genai.configure(api_key="AIzaSyBG8Ui2Iq_a4m8_1WtTLykyiDXizSUuffs")
+genai.configure(api_key(api_key=st.secrets["GEMINI_API_KEY"]))
 
 # 🔧 Use um dos modelos EXISTENTES
 MODEL_NAME = "models/gemini-2.5-pro"
@@ -78,7 +78,7 @@ Crie um ROTEIRO COMPLETO para {dias} dias em {destino} para {nome}.
 Siga a estrutura obrigatória:
 
 ### ✨ Resumão da Viagem
-300 a 400 caracteres.
+200 a 300 caracteres.
 
 ### 🎒 Checklist Pré-Viagem  
 - melhor época  
