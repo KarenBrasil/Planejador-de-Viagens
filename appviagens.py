@@ -153,17 +153,20 @@ Termine com uma mensagem acolhedora, motivadora e com vibe de:
 
                 """
 
-                resposta = model.generate_content(prompt)
-                st.success("Roteiro gerado com sucesso! ✨")
-                st.write(resposta.text)
+            resposta_obj = model.generate_content(prompt)
+            resposta = resposta_obj.text  # ← agora guarda texto corretamente
+
+            st.success("Roteiro gerado com sucesso! ✨")
+            st.write(resposta)
 
             except Exception as e:
-                st.error(f"Erro ao gerar roteiro: {e}")
+            st.error(f"Erro ao gerar roteiro: {e}")
 
 # ---------------------------------------------------------
 # 📄 BOTÃO PARA BAIXAR O PDF
 # ---------------------------------------------------------
-if resposta:
+
+if resposta:  # ← Agora sempre funciona sem erro
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
