@@ -163,12 +163,12 @@ Termine com uma mensagem acolhedora, motivadora e com vibe de:
 # ---------------------------------------------------------
 # 📄 BOTÃO PARA BAIXAR O PDF
 # ---------------------------------------------------------
-if resposta_texto:
+if resposta:
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    for linha in resposta_texto.split("\n"):
+    for linha in resposta.split("\n"):
         pdf.multi_cell(0, 10, linha)
 
     pdf.output("roteiro_viagem.pdf")
