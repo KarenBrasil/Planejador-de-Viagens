@@ -162,7 +162,7 @@ Termine com uma mensagem acolhedora, motivadora e com vibe de:
                 st.write(resposta)
 
             except Exception as e:
-            st.error(f"Erro ao gerar roteiro: {e}")
+                st.error(f"Erro ao gerar roteiro: {e}")
 
 # ---------------------------------------------------------
 # 📄 BOTÃO PARA BAIXAR O PDF
