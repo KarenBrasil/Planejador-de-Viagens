@@ -8,10 +8,10 @@ from reportlab.lib.pagesizes import letter
 resposta = None
 
 # 🔑 Configure sua chave API
-genai.configure(api_key(api_key=st.secrets["GEMINI_API_KEY"]))
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 # 🔧 Use um dos modelos EXISTENTES
-MODEL_NAME = "models/gemini-2.5-pro"
+MODEL_NAME = "gemini-1.5-flash"
 model = genai.GenerativeModel(MODEL_NAME)
 
 # ---------------------------------------------------------
