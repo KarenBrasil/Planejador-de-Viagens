@@ -100,11 +100,11 @@ Para cada dia:
 - endereços
 - alternativa paga/gratuita
 
-### 🍽️ Gastronomia Imperdível  
+### 🍽️ Gastronomia Local  
 ### 📸 Pontos Instagramáveis  
 ### 🌙 Vida Noturna  
-### 💡 Dicas de Ouro  
-### Finalização motivadora
+### 💡 Dicas de Indispensáveis
+### Sua viagem vai ser incrível
                 """
 
                 resposta_obj = model.generate_content(prompt)
