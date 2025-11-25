@@ -11,7 +11,7 @@ resposta = None
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 # 🔧 Use um dos modelos EXISTENTES
-MODEL_NAME = "gemini-1.5-flash"
+MODEL_NAME = "models/gemini-2.5-pro"
 model = genai.GenerativeModel(MODEL_NAME)
 
 # ---------------------------------------------------------
